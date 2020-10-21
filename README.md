@@ -44,6 +44,7 @@ To plot results run `python plot_balance.py ../../scenes_rate_scan/logs/() ../..
 ## Requirements
 
 The results in this paper were created using `Julia 1.3.1` and `Python 3.6` with `matplotlib`, `numpy` and `h5py`.
+To run the experiments using natural images, please download `IMAGES.mat` from http://www.rctn.org/bruno/sparsenet/ and place it into `src/input_generation/scenes/`.
 
 ### Julia Packages
 
