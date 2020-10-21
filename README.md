@@ -35,12 +35,6 @@ To plot the overview results run `python plot_scenes_comparison.py ../../scenes_
 
 Same as in figure 3.
 
-### Figure 7
-
-Run `julia scenes.jl`. Afterwards run `julia scenes_random.jl $folder`, where `$folder` is to be replaced by the results folder of the first run.
-
-To plot results run `python plot_balance.py ../../scenes_rate_scan/logs/() ../../scenes_rate_scan_random/logs/()`.
-
 ## Requirements
 
 The results in this paper were created using `Julia 1.3.1` and `Python 3.6` with `matplotlib`, `numpy` and `h5py`.
