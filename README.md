@@ -1,6 +1,6 @@
 # Dendritic balance enables local learning of efficient representations in networks of spiking neurons
 
-These files accompany the results obtained in *Dendritic balance enables local learning of efficientrepresentations in networks of spiking neurons*. For further details please refer to the manuscript posted on arxiv TODO.
+These files accompany the results obtained in *Dendritic balance enables local learning of efficientrepresentations in networks of spiking neurons*. For further details please refer to the manuscript posted on [arxiv](https://arxiv.org/abs/2010.12395).
 
 ## How to recreate results
 
