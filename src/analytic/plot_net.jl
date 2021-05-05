@@ -1,12 +1,12 @@
 using ImageMagick
-include("../src/log.jl")
-include("../src/neuron.jl")
-include("../src/net.jl")
-include("../src/snapshot.jl")
-include("../src/utils.jl")
+include("log.jl")
+include("neuron.jl")
+include("net.jl")
+include("snapshot.jl")
+include("utils.jl")
 include("plot_functions.jl")
 include("../input_generation/imageprocessing.jl")
-include("../src/connections.jl")
+include("connections.jl")
 
 using BSON
 

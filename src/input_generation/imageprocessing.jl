@@ -2,12 +2,16 @@ using MultivariateStats
 using DelimitedFiles: readdlm, writedlm
 
 """ Separates subimages in image with border for plotting"""
-function separate_subimages(X::Array{Float64, 2}, sub_length::Int, border_width::Int)
+function separate_subimages(X::Array{Float64, 2}, sub_length::Int, border_width::Int; inverted=false)
     bw = border_width
     splits = split_images(X, sub_length)
     s = size(splits)
     X_new = zeros(s[1], s[2]+2*bw, s[3]+2*bw)
-    X_new .= minimum(X)
+    if !inverted
+        X_new .= minimum(X)
+    else
+        X_new .= maximum(X)
+    end
     X_new[:,bw+1:end-bw,bw+1:end-bw] = splits
     return stitch_images(X_new)
 end
@@ -98,4 +102,17 @@ function stitch_images(X::Array{Float64,3})
     end
     return temp
 end
+
+""" Whiten data using a whitening matrix computed with the Stats package.
+ - W: Whitening matrix, if already calculated"""
+function whiten_images_cholesky(X::Array{Float64,2}, W=nothing)
+    X = permutedims(X, [2,1])
+    if isnothing(W)
+        f = fit(Whitening, X, mean=0)
+        W = f.W
+    end
+    X = W' * X
+    return W, permutedims(X, [2,1])
+end
+
 

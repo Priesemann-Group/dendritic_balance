@@ -1,49 +1,75 @@
 include("../src/analytic/settings.jl")
 include("../src/analytic/main.jl")
 
-function main_mnist_local(plotflag, s)
+function main_mnist(plotflag, dt, s)
     print("Setting up...\n")
-    nPatterns = 120000
+    nInitPatterns = 60000
+    nInhibitionPatterns = 30000
+    nFFPatterns = 120000
     nTestPatterns = 1000
     nNumbers = 3
 
-    set!(s, "comment", "")
+    set!(s, "comment", "dt=$(dt)")
     set!(s, "showProgressBar", true)
 
-    set!(s, "dt", 0.1)
+    set!(s, "dt", dt)
     set!(s, "tempLogSampleInterval", 5)
     set!(s, "updateInterval", 5)
     set!(s, "snapshotLogInterval", 5)
 
     l = s["presentationLength"]
-    nSteps = nPatterns * l
+    nInitSteps = nInitPatterns * l
+    nInhibitionSteps = (nInitPatterns + nInhibitionPatterns) * l
+    nSteps = (nInitPatterns + nInhibitionPatterns + nFFPatterns) * l
     set!(s, "tempLogInterval", 2000 * l)
 
     set!(s, "n_x", 16^2 )# number x neurons
     set!(s, "n_z", 9) # number z neurons
-
-    set!(s, "learningRateFeedForward", 0.5e-5)
-    set!(s, "learningRateInhibitoryRecurrent", 1e-5)    
-    set!(s, "learningRateHomeostaticBias", 0.5e-2)
-    set!(s, "learningRateDecoder", 0.5e-5)
     
+    startingweights = map(x -> exp(max(0,0.3*x-0.2)) - 0.99, randn(9,16^2))
+    startinginhibition = - map(x -> 0.0, randn(9,9))
+    for j in 1:9
+        startinginhibition[j,j] = - startingweights[j,:]' * startingweights[j,:]
+    end
 
-    set!(s, "initialSigma", sqrt(0.1))
+    set!(s, "learnedSigma", true)
+    set!(s, "initialSigma", 1.0)
+    set!(s, "fixedFinalSigma", true)
+    set!(s, "fixedFinalSigmaValue", sqrt(0.1))
+    set!(s, "learningRateSigma", 4e-6)
 
     set!(s, "localLearning_xz", true)
     set!(s, "learnedInhibition", true)
     set!(s, "reparametrizeBias", true)
-    set!(s, "learnedSigma", false)
     set!(s, "homeostaticBiases", true)
 
-    set!(s, "rho", 0.02)
+    set!(s, "rho", 0.015)
 
-    inputs = create_mnist_inputs(nPatterns, s, nNumbers=nNumbers)
+    inputs = create_mnist_inputs(nInitPatterns + nInhibitionPatterns + nFFPatterns, s, nNumbers=nNumbers)
     test_inputs = create_mnist_test(nTestPatterns, s, nNumbers=nNumbers)
-    test_times = collect(0:div(nSteps, 5):nSteps)
+    test_times = [nInitSteps,nInhibitionSteps,nSteps]
 
-    return main("mnist_somatic", plotflag, s, nSteps, inputs, test_inputs, test_times)
+    s["paramChangeDict"]["learningRateDecoder"] =
+        Dict(1          => 0.5e-5)
+    s["paramChangeDict"]["learningRateFeedForward"] =
+        Dict(1          => 0.0,    
+             nInitSteps => 0.0,    
+             nInhibitionSteps => 4.0e-6)
+    s["paramChangeDict"]["learningRateHomeostaticBias"] =
+        Dict(1          => 0.7e-2,
+             nInitSteps => 0.7e-2,    
+             nInhibitionSteps => 0.7e-2)
+    s["paramChangeDict"]["learningRateInhibitoryRecurrent"] =
+        Dict(1          => 0.0,
+             nInitSteps => 2.0e-5,    
+             nInhibitionSteps => 3.0e-5)
+
+    return main("Fig3_mnist_somatic", plotflag, s, nSteps, inputs, test_inputs, test_times, 
+                startingweights = startingweights, startinginhibition = startinginhibition)
 end
-
+    
 plotflag = true
-main_mnist_local(plotflag, copy(standardSettings))
+
+dt = 0.1
+
+main_mnist(plotflag, dt, copy(standardSettings))

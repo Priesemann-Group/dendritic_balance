@@ -8,6 +8,7 @@ using FileIO
 using Plots
 using ProgressMeter
 using MAT
+using Statistics
 
 function create_random_inputs(nPatterns::Int, s::Dict{String,Any})::Array{Float64,2}
     n = s["n_x"]::Int64
@@ -174,6 +175,51 @@ function get_natural_scenes(nPatterns::Int, s::Dict{String,Any}, img_size::Int=1
         img = vcat(temp, -temp)
         img = map(nl, img)
         input[i,:] .= img
+    end
+
+    return input .* strengthOn
+end
+
+
+""" Loads speech data used in Brendel et al (2020)."""
+function get_speech_data(nPatterns::Int, s::Dict{String,Any}; whiten::Bool=false, 
+    whitening_matrix=nothing)
+
+    splitPosNeg = s["splitPosNegInput"]::Bool
+    strengthOn = s["stimulusStrengthOn"]::Float64
+    dt = s["dt"]::Float64 # 0.05 ms in original publication
+    tau = s["kernelTau"]::Float64 # 12.5 ms in original publication (here in steps)
+
+    input_dir = @__DIR__
+    dic = matread(input_dir * "/speech/speech.mat")
+    sp = dic["speech"] 
+    # normalize data magnitude
+    data = 1.5 * sp["data"] ./ maximum(sp["data"])  # (25,:)
+    frequencies = sp["CF"] # (25)
+
+    block_length = Int(floor(size(data,2) / 50))
+
+    input = zeros(nPatterns, 25)
+    
+    ind = rand(1:(size(data,2)-block_length))
+    for i in 1:nPatterns
+        input[i,:] = data[:,ind]
+        ind += 1
+        if i % block_length == 0
+            ind = rand(1:(size(data,2)-block_length))
+        end
+    end
+    
+    
+    if whiten
+        input .-= mean(input, dims=1)
+        W, input = whiten_images_cholesky(input, whitening_matrix)
+        if splitPosNeg
+            input = hcat(input, -input)
+            nl(x) = max(0,x)
+            map!(nl, input, input)
+        end
+        return input .* strengthOn, W
     end
 
     return input .* strengthOn

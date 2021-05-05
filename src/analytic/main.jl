@@ -32,7 +32,7 @@ import Random
 function main(project::String, plotflag::Bool, s::Dict{String,Any}, nSteps::Int,
     inputs::Array{Float64,2}, test_inputs::Array{Float64,2}, test_times::Array{Int,1};
     name::String = string(Dates.now()), seed::Int = 87294, basefolder = "../../", 
-    startingweights = nothing)::Net
+    startingweights = nothing, startinginhibition = nothing)::Net
 
     Random.seed!(seed)
 
@@ -41,9 +41,12 @@ function main(project::String, plotflag::Bool, s::Dict{String,Any}, nSteps::Int,
 
     if !isnothing(startingweights)
         net.xz_weights = startingweights
-        if log.settings["learnedInhibition"]
+        if s["learnedInhibition"]
             net.zz_weights = get_inhibition_weights(Matrix(net.xz_weights'), 1.0)
         end
+    end
+    if !isnothing(startinginhibition)
+        net.zz_weights = startinginhibition
     end
     
     if s["comment"] != ""

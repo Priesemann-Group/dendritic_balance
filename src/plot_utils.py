@@ -21,13 +21,15 @@ def natural_keys(text):
     return [ atoi(c) for c in re.split(r'(\d+)', text) ]
 
 """ Arrange images in a grid with spacing """
-def gallery(array, ncols=-1, spacing=2):
+def gallery(array, ncols=-1, spacing=2, spacing_value=None):
     if ncols == -1:
         ncols = np.math.ceil(np.sqrt(array.shape[0]))
     nrows = np.math.ceil(array.shape[0]/float(ncols))
     cell_w = array.shape[2]
     cell_h = array.shape[1]
-    result = np.ones(((cell_h+spacing)*nrows + spacing, (cell_w+spacing)*ncols + spacing), dtype=array.dtype) * np.min(array)
+    if spacing_value is None:
+        spacing_value = np.min(array)
+    result = np.ones(((cell_h+spacing)*nrows + spacing, (cell_w+spacing)*ncols + spacing), dtype=array.dtype) * spacing_value
     s = spacing
     for i in range(0, nrows):
         for j in range(0, ncols):

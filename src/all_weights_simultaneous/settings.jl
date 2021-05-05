@@ -110,9 +110,9 @@ end
 
 function set_dt(s::Dict{String, Any}, dt::Any)
     s["dt"] = dt
-    s["presentationLength"] = Int(_presentationLength / dt)
+    s["presentationLength"] = Int(round(_presentationLength / dt))
     s["kernelTau"] = _tau / dt # [step]
-    s["kernelLength"] = Int(5 * s["kernelTau"])
+    s["kernelLength"] = Int(round(5 * s["kernelTau"]))
     s["kernel"] = [exp(-t/s["kernelTau"])
                     for t in 0:s["kernelLength"]-1]
 end
