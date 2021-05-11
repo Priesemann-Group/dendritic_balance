@@ -12,33 +12,37 @@ To plot results run `python plot_mnist.py ../../mnist/logs/() ../../mnist_somati
 
 ### Figure 4
 
-Run `julia bars_().jl $i`, where `$i` ranges from 1-1050. We recommend only using the analytic and somatic implementations, as the all weights implementations are slow.
+#### B
+
+Run `julia B_bars_().jl $i`, where `$i` ranges from 1-1050. We recommend only using the analytic and somatic implementations, as the all weights implementations are slow.
 
 To plot the overview results first concat the resulting losses into one file `cat results* > cresults.txt`, in the log folders.
-Then run `python plot_bars.py`.
+Then run `python B_plot_bars.py`.
+
+#### D
+
+Run `julia D_scenes_rate_scan.jl $i` and `julia D_scenes_rate_scan_somatic.jl $i`, where `$i` ranges from 1-9.
+
+To plot the overview results run `python D_plot_scenes_comparison.py ../../scenes_rate_scan/logs/ ../../scenes_rate_scan_somatic/logs/`.
 
 ### Figure 5
 
-Run `julia scenes_rate_scan.jl $i` and `julia scenes_rate_scan_somatic.jl $i`, where `$i` ranges from 1-9.
-
-To plot the overview results run `python plot_scenes_comparison.py ../../scenes_rate_scan/logs/ ../../scenes_rate_scan_somatic/logs/`.
-
-### Figure 6
-
 #### A
 
-Run `julia scenes_timestep_scan.jl $i` and `julia scenes_timestep_scan_somatic.jl $i`, where `$i` ranges from 1-72.
+Run `julia A_scenes_timestep_scan.jl $i` and `julia A_scenes_timestep_scan_somatic.jl $i`, where `$i` ranges from 1-72.
 
-To plot the overview results run `python plot_scenes_comparison.py ../../scenes_timestep_scan/logs/ ../../scenes_timestep_scan_somatic/logs/`.
+To plot the overview results run `python A_plot_scenes_comparison.py ../../scenes_timestep_scan/logs/ ../../scenes_timestep_scan_somatic/logs/`.
 
 #### B
 
 Same as in figure 3.
 
+
 ## Requirements
 
 The results in this paper were created using `Julia 1.3.1` and `Python 3.6` with `matplotlib`, `numpy` and `h5py`.
 To run the experiments using natural images, please download `IMAGES.mat` from http://www.rctn.org/bruno/sparsenet/ and place it into `src/input_generation/scenes/`.
+To run the experiments using speech data, please download `speech.mat` from https://github.com/machenslab/spikes/tree/master/UnsupervisedLearning/Figure5 and place it into `src/input_generation/speech/`
 
 ### Julia Packages
 

@@ -55,13 +55,6 @@ function create_net(s::Dict{String,Any}, log::Log)::Net
     sigma_2 = sigma ^ (-2)
 
     xz_weights = create_xz_connections(s)
-    # for learning rules of brendel et al
-    #memory["x_mean"] = zeros(n_x)
-    #memory["x_cov"] = zeros(n_z, n_x)
-    #memory["last_x"] = zeros(n_x)
-    # brendel et al use a faster leak for learning
-    #memory["plasticity_x"] = zeros(n_x)
-
     
     if learnedInhibition
         zz_weights = get_inhibition_weights(xz_weights, sigma_2) ./ sigma_2

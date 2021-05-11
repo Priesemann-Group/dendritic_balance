@@ -1,13 +1,13 @@
 
 function update_net(net::Net, s::Dict{String, Any})
-    localLearning_xz = s["localLearning_xz"]::Bool
+    hebbianLearning_xz = s["hebbianLearning_xz"]::Bool
     learnedInhibition = s["learnedInhibition"]::Bool
     learnedSigma = s["learnedSigma"]::Bool
     fixedFinalSigma = s["fixedFinalSigma"]::Bool
     homeostaticBiases = s["homeostaticBiases"]::Bool
 
-    if localLearning_xz
-        update_xz_weights_local(net, s)
+    if hebbianLearning_xz
+        update_xz_weights_hebbian(net, s)
     else
         update_xz_weights(net, s)
     end
@@ -50,7 +50,7 @@ function update_xz_weights(net::Net, s::Dict{String,Any})
     net.xz_weights += eta * dF'
 end
 
-function update_xz_weights_local(net::Net, s::Dict{String,Any})
+function update_xz_weights_hebbian(net::Net, s::Dict{String,Any})
     batchmult = s["updateInterval"]::Int
     eta = batchmult * s["learningRateFeedForward"]::Float64 * s["dt"]::Float64 
     F = net.xz_weights 

@@ -23,11 +23,11 @@ function update_net(net::Net, s::Dict{String, Any})
 end
 
 function update_net_on_spike(net::Net, s::Dict{String, Any})
-    localLearning_xz = s["localLearning_xz"]::Bool
+    hebbianLearning_xz = s["hebbianLearning_xz"]::Bool
     learnedInhibition = s["learnedInhibition"]::Bool
 
-    if localLearning_xz
-        update_xz_weights_local(net, s)
+    if hebbianLearning_xz
+        update_xz_weights_hebbian(net, s)
     else
         update_xz_weights(net, s)
     end
@@ -64,7 +64,7 @@ function update_xz_weights(net::Net, s::Dict{String,Any})
     net.xz_weights += eta * dF'
 end
 
-function update_xz_weights_local(net::Net, s::Dict{String,Any})
+function update_xz_weights_hebbian(net::Net, s::Dict{String,Any})
     eta = s["learningRateFeedForward"]::Float64 * s["dt"]::Float64 
     n_x = net.n_x
     n_z = net.n_z

@@ -18,7 +18,7 @@ standardSettings["stimulusStrengthOff"] = 0.0
 # in two neural populations (for noise and scenes)
 standardSettings["splitPosNegInput"] = false
 # changes nonlinearity for linear-Nonlinear Model
-# used in noise and scenes
+# used in natural scenes
 standardSettings["preprocessingNonlinearityShift"] = 0.8
 standardSettings["preprocessingNonlinearityScale"] = 3.2
 # 'fades' between image-presentations, denotes fraction of fade to constant
@@ -70,8 +70,6 @@ standardSettings["learnedSigma"] = true
 standardSettings["fixedFinalSigma"] = false
 # If "fixedFinalSigma" sigma will exponentially decay to this
 standardSettings["fixedFinalSigmaValue"] = 0.1
-# apply local learning rule to xz-weights
-standardSettings["localLearning_xz"] = false
 # Reparametrize bias so that it scales with the precision
 standardSettings["reparametrizeBias"] = false
 # learn homeostatic biases instead of model biases
