@@ -2,7 +2,6 @@
 function update_net(net::Net, s::Dict{String, Any})
     learnedInhibition = s["learnedInhibition"]::Bool
     learnedSigma = s["learnedSigma"]::Bool
-    fixedFinalSigma = s["fixedFinalSigma"]::Bool
     homeostaticBiases = s["homeostaticBiases"]::Bool
 
 
@@ -28,25 +27,21 @@ function update_net(net::Net, s::Dict{String, Any})
         update_z_biases(net, s)
     end
     if learnedSigma
-        if fixedFinalSigma
-            update_sigma_covariant_fixed(net, s)
-        else
-            update_sigma_covariant(net, s)
-        end
+        update_sigma_covariant(net, s)
     end
 end
 
 function update_xz_weights(net::Net, u::Array{Float64,2}, s::Dict{String,Any})
     batchmult = s["updateInterval"]::Int
-    eta = batchmult * s["learningRateFeedForward"]::Float64 * s["dt"]::Float64 
-    eta_bar = batchmult * s["learningRateFeedForwardBar"]::Float64 * s["dt"]::Float64 
+    eta = batchmult * s["learningRateFeedForward"]::Float64 * s["dt"]::Float64
+    eta_bar = batchmult * s["learningRateFeedForwardBar"]::Float64 * s["dt"]::Float64
     F = net.xz_weights
     F_bar = net.memory["xz_weights_bar"]::Array{Float64,2}
     z = net.z_outputs
-   
+
     for j in 1:net.n_z
         for i in 1:net.n_x
-            dF_bar = z[j] * u[i,j] 
+            dF_bar = z[j] * u[i,j]
             F_bar[j,i] += eta_bar * dF_bar
             dF = F_bar[j,i] / F[j,i] - F[j,i]
             F[j,i] += eta * dF
@@ -60,8 +55,8 @@ function update_zz_inhibitory_weights(net::Net, s::Dict{String,Any})
     z = net.z_outputs
     W = net.zz_weights
     batchmult = s["updateInterval"]::Int
-    eta = batchmult * s["learningRateInhibitoryRecurrent"]::Float64 * s["dt"]::Float64 
-    
+    eta = batchmult * s["learningRateInhibitoryRecurrent"]::Float64 * s["dt"]::Float64
+
     @inbounds for j in 1:net.n_z
         for k in 1:net.n_z
             dW = - z[k] * u[j]
@@ -74,9 +69,9 @@ function update_zz_inhibitory_pruned_weights(net::Net, u::Array{Float64,2}, s::D
     z = net.z_outputs
     W_pruned = net.zz_weights_pruned
     batchmult = s["updateInterval"]::Int
-    alpha = s["learningRateCorrelation"]::Float64 * s["dt"]::Float64 
+    alpha = s["learningRateCorrelation"]::Float64 * s["dt"]::Float64
     beta = s["learningFactorPruning"]::Float64
-    eta = batchmult * s["learningRateInhibitoryRecurrent"]::Float64 * s["dt"]::Float64 
+    eta = batchmult * s["learningRateInhibitoryRecurrent"]::Float64 * s["dt"]::Float64
 
     @inbounds for j in 1:net.n_z
         for i in 1:net.n_x
@@ -110,7 +105,7 @@ function update_zz_inhibitory_pruned_weights(net::Net, u::Array{Float64,2}, s::D
     # adjust weights with smaller p_c towards zero, keep self connections
     pruning_mask = (pruning_coefficients .<= pc_crit) .& self_connection_mask
     dW = - pruning_mask .* W_pruned
-    W_pruned .+= beta * eta * dW 
+    W_pruned .+= beta * eta * dW
 end
 
 function update_z_biases_homeostatic(net::Net, s::Dict{String,Any})
@@ -130,25 +125,6 @@ function update_z_biases_homeostatic(net::Net, s::Dict{String,Any})
 end
 
 function update_sigma_covariant(net::Net, s::Dict{String,Any})
-    sig = net.sigma
-    x = net.x_outputs
-    n_x = net.n_x
-    alpha = 1.0 / s["sigmaLearningOffset"]::Float64
-    batchmult = s["updateInterval"]::Int
-    eta = batchmult * s["learningRateSigma"]::Float64 * s["dt"]::Float64
-
-    rec = net.reconstruction
-    M = x - rec
-    dsig = 0.0
-    @inbounds for i in 1:n_x
-        dsig += (M[i]^2 - alpha * sig^2) * sig^(-1)
-    end
-
-    net.sigma += eta * dsig / n_x
-    net.sigma_2 = net.sigma^(-2)
-end
-
-function update_sigma_covariant_fixed(net::Net, s::Dict{String,Any})
     sig = net.sigma
     x = net.x_outputs
     n_x = net.n_x

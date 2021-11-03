@@ -24,7 +24,7 @@ function save_log(log::Log, name::String)
     rm("$name/log.h5", force=true)
     h5open("$name/log.h5", "w") do file
         # temp dictionary
-        g = g_create(file, "temp")
+        g = create_group(file, "temp")
         for (k,v) in log.temp
             g[k] = v
         end
@@ -32,17 +32,17 @@ function save_log(log::Log, name::String)
         # also save (simple) settings as attribute
         for k in keys(log.settings)
             if isa(log.settings[k], Number) || isa(log.settings[k], Bool)
-                attrs(g)[k] = log.settings[k]
+                attributes(g)[k] = log.settings[k]
             end
             if k == "whitening_matrix"
-                g = g_create(file, "whitening_matrix")
+                g = create_group(file, "whitening_matrix")
                 g["whitening_matrix"] = log.settings[k]
             end
         end
 
         # snapshots
         for i in 1:length(log.snapshots)
-            g = g_create(file, "snapshot$i")
+            g = create_group(file, "snapshot$i")
             sn = log.snapshots[i]
             keys = fieldnames(Snapshot)
             for k in 1:length(keys)
@@ -63,6 +63,7 @@ function save_log(log::Log, name::String)
         end
     end
 end
+
 
 """ Python HDF5 doesn't know Bool-Arrays. This function converts them to 'sparse'
 representation.

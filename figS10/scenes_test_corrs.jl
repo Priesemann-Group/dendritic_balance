@@ -80,7 +80,7 @@ function test_net()
     Random.seed!(seed)
     test_input = get_natural_scenes(nTestPatterns, net.log.settings, imageDim, scale=scale)
 
-    println("Creating snapshot for $(file), wrong everything")
+    println("Creating snapshot for $(file)")
     l = create_log(nSteps, s)
     net2 = create_net(s, l)
     net2.xz_weights .= copy(net.xz_weights)

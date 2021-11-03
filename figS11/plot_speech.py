@@ -55,12 +55,9 @@ def plot_results(dic_db_inst, dic_db_reg, dic_sb_inst, dic_sb_reg, folder):
     
     temp = dic_db_inst[u'temp']
     
-    whitening_matrix = dic_db_inst["whitening_matrix"].get("whitening_matrix")[()]
-    print(whitening_matrix)
-
     scale = 1.
-    N = 100
-    db_factor = 30 * 1.378 # revert normalization
+    N = 5
+    db_factor = 14 # revert normalization
 
     dt = temp.attrs.get("dt")
     interval = temp.attrs.get("snapshotLogInterval")
@@ -77,7 +74,7 @@ def plot_results(dic_db_inst, dic_db_reg, dic_sb_inst, dic_sb_reg, folder):
     snapshot = snapshots[-1]
     
     x = snapshot.get('x_outputs')[()]
-    x = unwhiten(x, whitening_matrix)
+    #x = unwhiten(x, whitening_matrix)
 
     pcm = axs[0,0].imshow(x[:,tmin:tmax] * db_factor, aspect='auto', extent=[0,(tmax-tmin)*interval*dt/1000,25,0])
     axs[0,0].set_ylabel('# input')
@@ -105,12 +102,13 @@ def plot_results(dic_db_inst, dic_db_reg, dic_sb_inst, dic_sb_reg, folder):
     
     #reconstruction
     x_hat = snapshot.get('reconstructions')[()]
-    x_hat = unwhiten(x_hat * db_factor, whitening_matrix)
+    #x_hat = unwhiten(x_hat * db_factor, whitening_matrix)
     
     for i in range(x_hat.shape[0]):
         x_hat[i,:] = np.convolve(x_hat[i,:], np.ones(N)/N, mode='same')
 
-    axs[0,1].imshow(x_hat[:,tmin:tmax], aspect='auto', extent=[0,(tmax-tmin)*interval*dt/1000,25,0])
+    axs[0,1].imshow(x_hat[:,tmin:tmax], aspect='auto', extent=[0,(tmax-tmin)*interval*dt/1000,25,0],
+                  vmin=np.min(x), vmax=np.max(x))
     axs[0,1].set_ylabel('# input')
     
     ## DB reg
@@ -134,12 +132,13 @@ def plot_results(dic_db_inst, dic_db_reg, dic_sb_inst, dic_sb_reg, folder):
     
     #reconstruction
     x_hat = snapshot.get('reconstructions')[()]
-    x_hat = unwhiten(x_hat * db_factor, whitening_matrix)
+    #x_hat = unwhiten(x_hat * db_factor, whitening_matrix)
     
     for i in range(x_hat.shape[0]):
         x_hat[i,:] = np.convolve(x_hat[i,:], np.ones(N)/N, mode='same')
 
-    axs[0,2].imshow(x_hat[:,tmin:tmax], aspect='auto', extent=[0,(tmax-tmin)*interval*dt/1000,25,0])
+    axs[0,2].imshow(x_hat[:,tmin:tmax], aspect='auto', extent=[0,(tmax-tmin)*interval*dt/1000,25,0],
+                  vmin=np.min(x), vmax=np.max(x))
     axs[0,2].set_ylabel('# input')
     
     ## SB instant
@@ -163,12 +162,13 @@ def plot_results(dic_db_inst, dic_db_reg, dic_sb_inst, dic_sb_reg, folder):
     
     #reconstruction
     x_hat = snapshot.get('reconstructions')[()]
-    x_hat = unwhiten(x_hat * db_factor, whitening_matrix)
+    #x_hat = unwhiten(x_hat * db_factor, whitening_matrix)
     
     for i in range(x_hat.shape[0]):
         x_hat[i,:] = np.convolve(x_hat[i,:], np.ones(N)/N, mode='same')
 
-    axs[0,3].imshow(x_hat[:,tmin:tmax], aspect='auto', extent=[0,(tmax-tmin)*interval*dt/1000,25,0]) 
+    axs[0,3].imshow(x_hat[:,tmin:tmax], aspect='auto', extent=[0,(tmax-tmin)*interval*dt/1000,25,0],
+                  vmin=np.min(x), vmax=np.max(x))
     axs[0,3].set_ylabel('# input')
     
     ## SB reg
@@ -192,16 +192,17 @@ def plot_results(dic_db_inst, dic_db_reg, dic_sb_inst, dic_sb_reg, folder):
     
     #reconstruction
     x_hat = snapshot.get('reconstructions')[()]
-    x_hat = unwhiten(x_hat * db_factor, whitening_matrix)
+    #x_hat = unwhiten(x_hat * db_factor, whitening_matrix)
     
     for i in range(x_hat.shape[0]):
         x_hat[i,:] = np.convolve(x_hat[i,:], np.ones(N)/N, mode='same')
 
-    axs[0,4].imshow(x_hat[:,tmin:tmax], aspect='auto', extent=[0,(tmax-tmin)*interval*dt/1000,25,0])
+    axs[0,4].imshow(x_hat[:,tmin:tmax], aspect='auto', extent=[0,(tmax-tmin)*interval*dt/1000,25,0], 
+                  vmin=np.min(x_hat), vmax=np.max(x_hat))
     axs[0,4].set_ylabel('# input')
     
     plt.tight_layout()
-    plt.savefig(folder + "/speech.svg")
+    plt.savefig(folder + "/S11_speech.svg")
     
 def unwhiten(data, W):
     l = data.shape[0]

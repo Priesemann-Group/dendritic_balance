@@ -30,7 +30,7 @@ function main_mnist_local(plotflag, s)
 
     set!(s, "initialSigma", sqrt(0.1))
 
-    set!(s, "localLearning_xz", true)
+    set!(s, "hebbianLearning_xz", true)
     set!(s, "learnedInhibition", true)
     set!(s, "reparametrizeBias", true)
     set!(s, "learnedSigma", false)

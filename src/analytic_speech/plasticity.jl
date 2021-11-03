@@ -1,31 +1,31 @@
 
 function update_net(net::Net, s::Dict{String, Any})
     hebbianLearning_xz = s["hebbianLearning_xz"]::Bool
+    unwhitened_input = s["unwhitenedInput"]::Bool
     learnedInhibition = s["learnedInhibition"]::Bool
     learnedSigma = s["learnedSigma"]::Bool
-    fixedFinalSigma = s["fixedFinalSigma"]::Bool
     homeostaticBiases = s["homeostaticBiases"]::Bool
 
     if hebbianLearning_xz
-        update_xz_weights_hebbian(net, s)
+        if unwhitened_input
+            update_xz_weights_hebbian_unwhitened(net, s)
+        else
+            update_xz_weights_hebbian(net, s)
+        end
     else
         update_xz_weights(net, s)
     end
     if learnedInhibition
         update_zz_inhibitory_weights(net, s)
-    end    
-    
+    end
+
     if homeostaticBiases
         update_z_biases_homeostatic(net, s)
     else
         update_z_biases(net, s)
     end
     if learnedSigma
-        if fixedFinalSigma
-            update_sigma_covariant_fixed(net, s)
-        else
-            update_sigma_covariant(net, s)
-        end
+        update_sigma_covariant(net, s)
     end
     if !learnedInhibition
         F = net.xz_weights
@@ -33,18 +33,18 @@ function update_net(net::Net, s::Dict{String, Any})
         o2 = net.sigma_2
 
         net.memory["inhibition_weights"] .= get_inhibition_weights(F, o2)
-        net.memory["instant_self_inhibition"] .= 
+        net.memory["instant_self_inhibition"] .=
             calc_instant_self_inhibition(net.memory["inhibition_weights"]::Array{Float64,2}, s)
     end
 end
 
 function update_xz_weights(net::Net, s::Dict{String,Any})
     batchmult = s["updateInterval"]::Int
-    eta = batchmult * s["learningRateFeedForward"]::Float64 * s["dt"]::Float64 
+    eta = batchmult * s["learningRateFeedForward"]::Float64 * s["dt"]::Float64
     F = net.xz_weights
     z = net.z_outputs
     x = net.x_outputs
-    
+
     e = x - F' * z
     dF = e * z'
     net.xz_weights += eta * dF'
@@ -52,14 +52,34 @@ end
 
 function update_xz_weights_hebbian(net::Net, s::Dict{String,Any})
     batchmult = s["updateInterval"]::Int
-    eta = batchmult * s["learningRateFeedForward"]::Float64 * s["dt"]::Float64 
-    F = net.xz_weights 
+    eta = batchmult * s["learningRateFeedForward"]::Float64 * s["dt"]::Float64
+    F = net.xz_weights
     x = net.x_outputs
     z = net.z_outputs
-    
+
     for i in 1:net.n_x
         for j in 1:net.n_z
             dF = z[j] * (x[i] - F[j,i] * z[j])
+            F[j,i] += eta * dF
+        end
+    end
+end
+
+function update_xz_weights_hebbian_unwhitened(net::Net, s::Dict{String,Any})
+    batchmult = s["updateInterval"]::Int
+    eta = batchmult * s["learningRateFeedForward"]::Float64 * s["dt"]::Float64
+    F = net.xz_weights
+    x = net.x_outputs
+    z = net.z_outputs
+
+    act = F * x
+    # alpha rescales weights to typical size
+    alpha = 10.0
+    pots = 1 .- act .* z ./ alpha
+
+    for i in 1:net.n_x
+        for j in 1:net.n_z
+            dF = z[j] * (x[i] * pots[j])
             F[j,i] += eta * dF
         end
     end
@@ -88,7 +108,7 @@ function update_zz_inhibitory_weights_brendel(net::Net, s::Dict{String,Any})
     o = net.sigma
     o2 = net.sigma_2
     batchmult = s["updateInterval"]::Int
-    eta = s["learningRateInhibitoryRecurrent"]::Float64 
+    eta = s["learningRateInhibitoryRecurrent"]::Float64
     mu = 0.1
     alpha = 1.0
 
@@ -128,25 +148,6 @@ function update_z_biases_homeostatic(net::Net, s::Dict{String,Any})
 end
 
 function update_sigma_covariant(net::Net, s::Dict{String,Any})
-    sig = net.sigma
-    x = net.x_outputs
-    n_x = net.n_x
-    alpha = 1.0 / s["sigmaLearningOffset"]::Float64
-    batchmult = s["updateInterval"]::Int
-    eta = batchmult * s["learningRateSigma"]::Float64 * s["dt"]::Float64
-
-    rec = net.reconstruction
-    M = x - rec
-    dsig = 0.0
-    @inbounds for i in 1:n_x
-        dsig += (M[i]^2 - alpha * sig^2) * sig^(-1)
-    end
-
-    net.sigma += eta * dsig / n_x
-    net.sigma_2 = net.sigma^(-2)
-end
-
-function update_sigma_covariant_fixed(net::Net, s::Dict{String,Any})
     sig = net.sigma
     x = net.x_outputs
     n_x = net.n_x

@@ -85,8 +85,8 @@ function plot_snapshot(net::Net, snapshot::Snapshot, folder::String, s::Dict{Str
     plot_xz_weights(snapshot.xz_weights, folder * "snapshot$ap-$t/xz_weights", s)
     plot_zz_weights(snapshot.zz_weights, folder * "snapshot$ap-$t/zz_weights")
     plot_biases(snapshot.z_biases, folder * "snapshot$ap-$t/z_biases")
-    plot_reconstructions(snapshot.reconstruction_means, folder * "snapshot$ap-$t/", s)
-    plot_reconstructions(snapshot.reconstruction_vars, folder * "snapshot$ap-$t/", s, "_var")
+    #plot_reconstructions(snapshot.reconstruction_means, folder * "snapshot$ap-$t/", s)
+    #plot_reconstructions(snapshot.reconstruction_vars, folder * "snapshot$ap-$t/", s, "_var")
     plot_reconstruction_comparison(snapshot.reconstructions, snapshot.x_outputs, folder * "snapshot$ap-$t/", s)
     plot_decoder_weights(snapshot.decoder_weights, folder * "snapshot$ap-$t/decoder_weights", s)
     w = get_inhibition_weights(net.log.decoder.D, snapshot.xz_weights, snapshot.sigma_2)
@@ -200,29 +200,9 @@ function plot_zz_weights(weights::Array{Float64}, name::String)
 end
 
 function plot_xz_weights(weights::Array{Float64}, name::String, s::Dict{String,Any})
-    splitPosNeg = s["splitPosNegInput"]::Bool
-
-    n = size(weights)[2]
-    m = size(weights)[1]
-    nImg = splitPosNeg ? div(n, 2) : n
-    sidelength = Int(sqrt(nImg))
-    nCols = Int(ceil(sqrt(m)))
-
-    img = zeros(nCols*sidelength,nCols*sidelength)
-    for i in 1:m
-        weight = weights[i,:]
-        if splitPosNeg
-            weight = (weight[1:nImg] - weight[nImg+1:end])
-        end
-        col = ((i-1)%nCols)
-        row = div(i-1,nCols)
-        img[col*sidelength+1:(col+1)*sidelength, row*sidelength+1:(row+1)*sidelength] =
-            reshape(weight,sidelength,sidelength)
-    end
-    img = separate_subimages(img, sidelength, 1)
     PyPlot.clf()
     PyPlot.figure(figsize=(5.0,4.0))
-    PyPlot.imshow(img',cmap="Greys")
+    PyPlot.imshow(weights',cmap="Greys")
     ax = PyPlot.gca()
     ax.axis("off")
     PyPlot.colorbar()
@@ -231,29 +211,9 @@ function plot_xz_weights(weights::Array{Float64}, name::String, s::Dict{String,A
 end
 
 function plot_decoder_weights(weights::Array{Float64}, name::String, s::Dict{String,Any})
-    splitPosNeg = s["splitPosNegInput"]::Bool
-
-    n = size(weights)[1]
-    m = size(weights)[2]
-    nImg = splitPosNeg ? div(n, 2) : n
-    sidelength = Int(sqrt(nImg))
-    nCols = Int(ceil(sqrt(m)))
-
-    img = zeros(nCols*sidelength,nCols*sidelength)
-    for i in 1:m
-        weight = weights[:,i]
-        if splitPosNeg
-            weight = (weight[1:nImg] - weight[nImg+1:end])
-        end
-        col = ((i-1)%nCols)
-        row = div(i-1,nCols)
-        img[col*sidelength+1:(col+1)*sidelength, row*sidelength+1:(row+1)*sidelength] =
-            reshape(weight,sidelength,sidelength)
-    end
-    img = separate_subimages(img, sidelength, 1)
     PyPlot.clf()
     PyPlot.figure(figsize=(5.0,4.0))
-    PyPlot.imshow(img',cmap="Greys")
+    PyPlot.imshow(weights',cmap="Greys")
     ax = PyPlot.gca()
     ax.axis("off")
     PyPlot.colorbar()

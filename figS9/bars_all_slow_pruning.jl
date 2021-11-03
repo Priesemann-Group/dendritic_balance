@@ -9,13 +9,13 @@ function main_bars(plotflag, s, corr, pruning_fraction)
     print("Setting up...\n")
     nPatterns = 400000
     nTestPatterns = 500
-    
+
     set!(s, "showProgressBar", true)
-    
+
     dt = 1.0
     set!(s, "dt", dt)
     set!(s, "tempLogSampleInterval", Int(5.0/dt))
-    set!(s, "updateInterval", 1) 
+    set!(s, "updateInterval", 1)
     set!(s, "snapshotLogInterval", Int(3.0/dt))
 
     l = s["presentationLength"]
@@ -42,15 +42,14 @@ function main_bars(plotflag, s, corr, pruning_fraction)
 
     set!(s, "learnedSigma", true)
     set!(s, "initialSigma", 1.0)
-    set!(s, "fixedFinalSigma", true)
     set!(s, "fixedFinalSigmaValue", sqrt(0.1))
 
-    set!(s, "localLearning_xz", false)
+    set!(s, "hebbianLearning_xz", false)
     set!(s, "reparametrizeBias", true)
     set!(s, "learnedInhibition", false)
     set!(s, "homeostaticBiases", true)
     set!(s, "rho", 0.015)
-    
+
     set!(s, "weightMean", 0.001)
 
     Random.seed!(1010)

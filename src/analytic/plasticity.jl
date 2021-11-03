@@ -2,7 +2,6 @@
 function update_net(net::Net, s::Dict{String, Any})
     learnedInhibition = s["learnedInhibition"]::Bool
     learnedSigma = s["learnedSigma"]::Bool
-    fixedFinalSigma = s["fixedFinalSigma"]::Bool
     homeostaticBiases = s["homeostaticBiases"]::Bool
 
     if learnedInhibition
@@ -14,11 +13,7 @@ function update_net(net::Net, s::Dict{String, Any})
         update_z_biases(net, s)
     end
     if learnedSigma
-        if fixedFinalSigma
-            update_sigma_covariant_fixed(net, s)
-        else
-            update_sigma_covariant(net, s)
-        end
+        update_sigma_covariant(net, s)
     end
 end
 
@@ -38,13 +33,13 @@ function update_net_on_spike(net::Net, s::Dict{String, Any})
         o2 = net.sigma_2
 
         net.memory["inhibition_weights"] .= get_inhibition_weights(D, F, o2)
-        net.memory["instant_self_inhibition"] .= 
+        net.memory["instant_self_inhibition"] .=
             calc_instant_self_inhibition(net.memory["inhibition_weights"]::Array{Float64,2}, s)
     end
 end
 
 function update_xz_weights(net::Net, s::Dict{String,Any})
-    eta = s["learningRateFeedForward"]::Float64 * s["dt"]::Float64 
+    eta = s["learningRateFeedForward"]::Float64 * s["dt"]::Float64
     F = net.xz_weights
     D = net.log.decoder.D
     tau = s["kernelTau"]::Float64
@@ -60,19 +55,19 @@ function update_xz_weights(net::Net, s::Dict{String,Any})
     z0e2 = z0 .* et2
 
     rec0 = F' * z0
-    dF = x0 * z0e' - rec0 * z0e2' 
+    dF = x0 * z0e' - rec0 * z0e2'
     net.xz_weights += eta * dF'
 end
 
 function update_xz_weights_hebbian(net::Net, s::Dict{String,Any})
-    eta = s["learningRateFeedForward"]::Float64 * s["dt"]::Float64 
+    eta = s["learningRateFeedForward"]::Float64 * s["dt"]::Float64
     n_x = net.n_x
     n_z = net.n_z
 
     F = net.xz_weights
     x = net.x_outputs
     rec = net.reconstruction
-    
+
     tau = s["kernelTau"]::Float64
 
     t = net.log.t
@@ -137,26 +132,7 @@ function update_z_biases_homeostatic(net::Net, s::Dict{String,Any})
     net.z_rates .= 0.0
 end
 
-function update_sigma_covariant(net::Net, s::Dict{String,Any})
-    sig = net.sigma
-    x = net.x_outputs
-    n_x = net.n_x
-    alpha = 1.0 / s["sigmaLearningOffset"]::Float64
-    batchmult = s["updateInterval"]::Int
-    eta = batchmult * s["learningRateSigma"]::Float64 * s["dt"]::Float64
-
-    rec = net.reconstruction
-    M = x - rec
-    dsig = 0.0
-    @inbounds for i in 1:n_x
-        dsig += (M[i]^2 - alpha * sig^2) * sig^(-1)
-    end
-
-    net.sigma += eta * dsig / n_x
-    net.sigma_2 = net.sigma^(-2)
-end
-
-function update_sigma_covariant_fixed(net::Net, s::Dict{String,Any})
+function update_sigma_covarian(net::Net, s::Dict{String,Any})
     sig = net.sigma
     x = net.x_outputs
     n_x = net.n_x

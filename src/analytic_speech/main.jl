@@ -64,7 +64,6 @@ function main(project::String, plotflag::Bool, s::Dict{String,Any}, nSteps::Int,
             folder = save_loc * "/plots"
             rm(folder, recursive=true, force=true)
             mkpath(folder)
-            plot_patterns(test_inputs, folder, s)
             plot_net(net, folder)
         catch e
             print("Error while plotting:\n")

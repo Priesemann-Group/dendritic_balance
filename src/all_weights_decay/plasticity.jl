@@ -2,7 +2,6 @@
 function update_net(net::Net, s::Dict{String, Any})
     learnedInhibition = s["learnedInhibition"]::Bool
     learnedSigma = s["learnedSigma"]::Bool
-    fixedFinalSigma = s["fixedFinalSigma"]::Bool
     homeostaticBiases = s["homeostaticBiases"]::Bool
 
     update_xz_weights(net, s)
@@ -13,22 +12,18 @@ function update_net(net::Net, s::Dict{String, Any})
         update_z_biases(net, s)
     end
     if learnedSigma
-        if fixedFinalSigma
-            update_sigma_covariant_fixed(net, s)
-        else
-            update_sigma_covariant(net, s)
-        end
+        update_sigma_covariant(net, s)
     end
 end
 
 function update_xz_weights(net::Net, s::Dict{String,Any})
     batchmult = s["updateInterval"]::Int
-    eta = batchmult * s["learningRateFeedForward"]::Float64 * s["dt"]::Float64 
+    eta = batchmult * s["learningRateFeedForward"]::Float64 * s["dt"]::Float64
     F = net.xz_weights
     z = net.z_outputs
     x = net.x_outputs
     u = net.dendritic_potentials
-    lambda = s["lambdaConstraint"]::Float64 
+    lambda = s["lambdaConstraint"]::Float64
 
     for j in 1:net.n_z
         for i in 1:net.n_x
@@ -43,8 +38,8 @@ function update_zz_inhibitory_weights(net::Net, s::Dict{String,Any})
     z = net.z_outputs
     u = net.dendritic_potentials
     batchmult = s["updateInterval"]::Int
-    eta = batchmult * s["learningRateInhibitoryRecurrent"]::Float64 * s["dt"]::Float64 
-    lambda = s["lambdaConstraint"]::Float64 
+    eta = batchmult * s["learningRateInhibitoryRecurrent"]::Float64 * s["dt"]::Float64
+    lambda = s["lambdaConstraint"]::Float64
 
     @inbounds for j in 1:net.n_z
         for i in 1:net.n_x
@@ -73,25 +68,6 @@ function update_z_biases_homeostatic(net::Net, s::Dict{String,Any})
 end
 
 function update_sigma_covariant(net::Net, s::Dict{String,Any})
-    sig = net.sigma
-    x = net.x_outputs
-    n_x = net.n_x
-    alpha = 1.0 / s["sigmaLearningOffset"]::Float64
-    batchmult = s["updateInterval"]::Int
-    eta = batchmult * s["learningRateSigma"]::Float64 * s["dt"]::Float64
-
-    rec = net.reconstruction
-    M = x - rec
-    dsig = 0.0
-    @inbounds for i in 1:n_x
-        dsig += (M[i]^2 - alpha * sig^2) * sig^(-1)
-    end
-
-    net.sigma += eta * dsig / n_x
-    net.sigma_2 = net.sigma^(-2)
-end
-
-function update_sigma_covariant_fixed(net::Net, s::Dict{String,Any})
     sig = net.sigma
     x = net.x_outputs
     n_x = net.n_x

@@ -220,9 +220,10 @@ function get_speech_data(nPatterns::Int, s::Dict{String,Any}; whiten::Bool=false
             map!(nl, input, input)
         end
         return input .* strengthOn, W
+    else
+        return input .* strengthOn / std(input)
     end
 
-    return input .* strengthOn
 end
 
 function fade(inputs::SubArray{Float64,1,Array{Float64,2},Tuple{Int64,Base.Slice{Base.OneTo{Int64}}},true},

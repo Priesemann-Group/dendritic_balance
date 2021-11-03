@@ -33,9 +33,9 @@ function main_speech(plotflag, dt, oneSpikePerTimestep, s)
     set!(s, "learningRateHomeostaticBias", speed*2e-2)
     set!(s, "learningRateDecoder", speed*3e-4)
 
-    set!(s, "initialSigma", sqrt(0.05))
+    set!(s, "initialSigma", sqrt(0.2))
 
-    set!(s, "localLearning_xz", false)
+    set!(s, "hebbianLearning_xz", false)
     set!(s, "learnedInhibition", false)
     set!(s, "homeostaticBiases", true)
     

@@ -17,6 +17,8 @@ standardSettings["stimulusStrengthOff"] = 0.0
 # represent positive and negative part of input
 # in two neural populations (for noise and scenes)
 standardSettings["splitPosNegInput"] = false
+# mark input as unwhitened, so the Brendel et al rule for unwhitened inputs is used (when hebbian learning)
+standardSettings["unwhitenedInput"] = false
 # changes nonlinearity for linear-Nonlinear Model
 # used in natural scenes
 standardSettings["preprocessingNonlinearityShift"] = 0.8
@@ -62,15 +64,8 @@ standardSettings["learningRateHomeostaticBias"] = 0.001
 standardSettings["learningRateSigma"] = 5*1e-6
 standardSettings["learningRateRates"] = 5*1e-6
 standardSettings["learningRateDecoder"] = 5*1e-4
-# Sometimes the model sigma is better to be higher than
-# according to the model. The factor is there to prevent
-# under-estimation of sigma which can lead to bad model
-# performance. This is the factor to learn α⋅σ² instead of σ².
-standardSettings["sigmaLearningOffset"] = 2.0
-standardSettings["learnedSigma"] = true
-# sigma approaches α
-standardSettings["fixedFinalSigma"] = false
-# If "fixedFinalSigma" sigma will exponentially decay to this
+standardSettings["learnedSigma"] = false
+# Sigma will exponentially decay to this
 standardSettings["fixedFinalSigmaValue"] = 0.1
 # apply hebbian-like learning rule to xz-weights
 standardSettings["hebbianLearning_xz"] = false
@@ -99,7 +94,7 @@ standardSettings["tempLogInterval"] = 1000
 standardSettings["tempLogSampleInterval"] = 1
 # Save only every nth timestep in the snapshot to save space
 standardSettings["snapshotLogInterval"] = 1
-# Number of images saved in snapshot 
+# Number of images saved in snapshot
 standardSettings["snapshotNumberTestImages"] = 30
 standardSettings["testWeightsNecessity"] = false
 

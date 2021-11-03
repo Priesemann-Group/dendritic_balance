@@ -11,11 +11,11 @@ function main_bars_local(plotflag, s, corr)
     nTestPatterns = 500
 
     set!(s, "showProgressBar", true)
-    
+
     dt = 1.0
     set!(s, "dt", dt)
     set!(s, "tempLogSampleInterval", Int(5.0/dt))
-    set!(s, "updateInterval", 1) 
+    set!(s, "updateInterval", 1)
     set!(s, "snapshotLogInterval", Int(3.0/dt))
 
     l = s["presentationLength"]
@@ -35,10 +35,9 @@ function main_bars_local(plotflag, s, corr)
 
     set!(s, "learnedSigma", true)
     set!(s, "initialSigma", 1.0)
-    set!(s, "fixedFinalSigma", true)
     set!(s, "fixedFinalSigmaValue", sqrt(0.1))
 
-    set!(s, "localLearning_xz", true)
+    set!(s, "hebbianLearning_xz", true)
     set!(s, "reparametrizeBias", true)
     set!(s, "learnedInhibition", true)
     set!(s, "homeostaticBiases", true)
@@ -54,4 +53,3 @@ end
 plotflag = true
 corr = 0.6
 net = main_bars_local(plotflag, copy(standardSettings), corr)
-

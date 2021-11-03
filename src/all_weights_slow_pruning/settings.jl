@@ -68,15 +68,8 @@ standardSettings["learningRateHomeostaticBias"] = 0.001
 standardSettings["learningRateSigma"] = 5*1e-6
 standardSettings["learningRateRates"] = 5*1e-6
 standardSettings["learningRateDecoder"] = 5*1e-4
-# Sometimes the model sigma is better to be higher than
-# according to the model. The factor is there to prevent
-# under-estimation of sigma which can lead to bad model
-# performance. This is the factor to learn α⋅σ² instead of σ².
-standardSettings["sigmaLearningOffset"] = 2.0
 standardSettings["learnedSigma"] = true
-# sigma approaches α
-standardSettings["fixedFinalSigma"] = false
-# If "fixedFinalSigma" sigma will exponentially decay to this
+# Sigma will exponentially decay to this
 standardSettings["fixedFinalSigmaValue"] = 0.1
 # Reparametrize bias so that it scales with the precision
 standardSettings["reparametrizeBias"] = false

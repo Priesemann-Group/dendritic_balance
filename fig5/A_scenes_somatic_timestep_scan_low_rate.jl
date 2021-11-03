@@ -34,10 +34,9 @@ function main_scenes(plotflag, s, timestep, noise, seed=1234)
 
     set!(s, "learnedSigma", true)
     set!(s, "initialSigma", 1.0)
-    set!(s, "fixedFinalSigma", true)
     set!(s, "fixedFinalSigmaValue", sqrt(noise))
 
-    set!(s, "localLearning_xz", true)
+    set!(s, "hebbianLearning_xz", true)
     set!(s, "reparametrizeBias", false)
     set!(s, "learnedInhibition", true)
     set!(s, "homeostaticBiases", true)
@@ -50,7 +49,7 @@ function main_scenes(plotflag, s, timestep, noise, seed=1234)
         Dict(1          => 4e-5,
              200000 * l => 3e-5)
     s["paramChangeDict"]["learningRateFeedForward"] =
-        Dict(1          => 4e-5,    
+        Dict(1          => 4e-5,
              200000 * l => 3e-5)
     s["paramChangeDict"]["learningRateHomeostaticBias"] =
         Dict(1          => 6e-3,
@@ -78,4 +77,3 @@ cs = CartesianIndices((1:length(timesteps), 1:length(noises)))
 i, j = Tuple(cs[id])
 
 main_scenes(plotflag, copy(standardSettings), timesteps[i], noises[j])
-

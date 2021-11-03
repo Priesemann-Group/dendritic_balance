@@ -23,18 +23,18 @@ function main_speech(plotflag, dt, oneSpikePerTimestep, s)
     nSteps = nPatterns * l
     set!(s, "tempLogInterval", div(nPatterns, 30) * l)
 
-    set!(s, "n_x", 50) # number x neurons
+    set!(s, "n_x", 25) # number x neurons
     set!(s, "n_z", 100) # number z neurons
     
     speed = 0.7
 
-    set!(s, "learningRateFeedForward", speed*3e-4)
-    set!(s, "learningRateInhibitoryRecurrent", speed*8e-4)
+    set!(s, "learningRateFeedForward", speed*7e-5)
+    set!(s, "learningRateInhibitoryRecurrent", speed*4e-4)
     set!(s, "learningRateHomeostaticBias", speed*2e-2)
-    set!(s, "learningRateDecoder", speed*3e-4)
+    set!(s, "learningRateDecoder", speed*7e-5)
 
     set!(s, "initialSigma", sqrt(0.2))
-        
+
     set!(s, "hebbianLearning_xz", true)
     set!(s, "learnedInhibition", true)
     set!(s, "homeostaticBiases", true)
@@ -46,19 +46,18 @@ function main_speech(plotflag, dt, oneSpikePerTimestep, s)
 
     set!(s, "oneSpikePerTimestep", oneSpikePerTimestep)
 
+    set!(s, "unwhitenedInput", true)
     Random.seed!(10)
-    inputs, W = get_speech_data(nPatterns, s, whiten=true)
-    test_inputs, _ = get_speech_data(nTestPatterns, s, whiten=true, whitening_matrix=W)
+    inputs = get_speech_data(nPatterns, s, whiten=false)
+    test_inputs = get_speech_data(nTestPatterns, s, whiten=false)
     test_times = collect(1:div(nSteps-1, 5):nSteps)
-    
-    s["whitening_matrix"] = W
 
-    return main("Fig5_speech_somatic", plotflag, s, nSteps, inputs, test_inputs, test_times)
+    return main("S11_speech_somatic", plotflag, s, nSteps, inputs, test_inputs, test_times)
 end
     
 plotflag = true
 
-dt = 0.05 # [ms]
+dt = 0.5 # [ms]
 
 main_speech(plotflag, dt, true, copy(standardSettings))
 main_speech(plotflag, dt, false, copy(standardSettings))

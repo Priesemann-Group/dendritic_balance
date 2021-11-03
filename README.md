@@ -8,7 +8,7 @@ These files accompany the results obtained in *Dendritic balance enables local l
 
 Run `julia mnist_().jl`, where `()` is to be replaced to execute the desired file.
 
-To plot results run `python plot_mnist.py ../../mnist/logs/() ../../mnist_somatic/logs/()`, where `()` is to be replaced with the desired folder.
+To plot results run `python plot_mnist.py ../../Fig3_mnist_all_weights_decay/logs/() ../../Fig3_mnist_somatic/logs/()`, where `()` is to be replaced with the desired folder.
 
 ### Figure 4
 
@@ -23,7 +23,7 @@ Then run `python B_plot_bars.py`.
 
 Run `julia D_scenes_rate_scan.jl $i` and `julia D_scenes_rate_scan_somatic.jl $i`, where `$i` ranges from 1-9.
 
-To plot the overview results run `python D_plot_scenes_comparison.py ../../scenes_rate_scan/logs/ ../../scenes_rate_scan_somatic/logs/`.
+To plot the overview results run `python D_plot_scenes_comparison.py ../../Fig4_scenes_rate_scan/logs/ ../../Fig4_scenes_rate_scan_somatic/logs/`.
 
 ### Figure 5
 
@@ -31,7 +31,7 @@ To plot the overview results run `python D_plot_scenes_comparison.py ../../scene
 
 Run `julia A_scenes_timestep_scan.jl $i` and `julia A_scenes_timestep_scan_somatic.jl $i`, where `$i` ranges from 1-72.
 
-To plot the overview results run `python A_plot_scenes_comparison.py ../../scenes_timestep_scan/logs/ ../../scenes_timestep_scan_somatic/logs/`.
+To plot the overview results run `python A_plot_scenes_comparison.py ../../Fig5_scenes_somatic_timestep_scan/logs/ ../../Fig5_scenes_somatic_timestep_scan_somatic/logs/`.
 
 #### B
 
